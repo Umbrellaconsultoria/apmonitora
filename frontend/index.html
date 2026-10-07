@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0a0f1e" />
+  <meta name="description" content="apMonitora - Sistema de monitoramento de entrada e saída de pessoas" />
+
+  <title>apMonitora</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/styles/main.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Tela de loading -->
+    <div id="loading-screen" class="loading-screen">
+      <div class="loading-content">
+        <div class="loading-icon">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+            <path d="M2 12c0-3.3 0-5 .8-6.2a5 5 0 0 1 1-1C5 4 6.7 4 10 4h4c3.3 0 5 0 6.2.8a5 5 0 0 1 1 1C22 7 22 8.7 22 12s0 5-.8 6.2a5 5 0 0 1-1 1C19 20 17.3 20 14 20h-4c-3.3 0-5 0-6.2-.8a5 5 0 0 1-1-1C2 17 2 15.3 2 12Z"/>
+          </svg>
+        </div>
+        <h1 class="loading-title">apMonitora</h1>
+        <p class="loading-subtitle">Carregando modelos de detecção...</p>
+        <div class="loading-bar">
+          <div class="loading-bar-fill" id="loading-progress"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tela de Setup -->
+    <div id="setup-page" class="page" style="display:none;"></div>
+
+    <!-- Tela de Monitor -->
+    <div id="monitor-page" class="page" style="display:none;"></div>
+
+    <!-- Tela de Dashboard -->
+    <div id="dashboard-page" class="page" style="display:none;"></div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

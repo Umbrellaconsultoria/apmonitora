@@ -1,0 +1,53 @@
+# Dependências
+node_modules/
+*/node_modules/
+venv/
+*/venv/
+.venv/
+*/.venv/
+env/
+*/env/
+
+# Python cache
+__pycache__/
+*/__pycache__/
+*/**/__pycache__/
+*.py[cod]
+*$py.class
+
+# Ambiente e Variáveis Secretas
+.env
+*/.env
+*.env.local
+
+# Builds e Bundles
+dist/
+*/dist/
+build/
+*/build/
+.vite/
+*/.vite/
+
+# Uploads e Arquivos Gerados (manter pastas com .gitkeep se houver)
+uploads/*
+!uploads/.gitkeep
+!uploads/rostos/
+uploads/rostos/*
+!uploads/rostos/.gitkeep
+backend/uploads/*
+!backend/uploads/.gitkeep
+!backend/uploads/rostos/
+backend/uploads/rostos/*
+!backend/uploads/rostos/.gitkeep
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Sistema Operacional e IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

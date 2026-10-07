@@ -1,0 +1,27 @@
+{
+  "name": "apmonitora-backend",
+  "version": "1.0.0",
+  "description": "Backend API do sistema de monitoramento de entrada/saída",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "db:generate": "node scripts/prisma.js generate",
+    "db:push": "node scripts/prisma.js db push",
+    "db:migrate": "node scripts/prisma.js migrate dev",
+    "db:studio": "node scripts/prisma.js studio"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.5.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "multer": "^1.4.5-lts.2",
+    "socket.io": "^4.8.1",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.5.0"
+  }
+}

@@ -1,0 +1,132 @@
+// Prisma Schema - apMonitora
+// Sistema de monitoramento de entrada e saída de pessoas
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Dispositivos (tablets) cadastrados no sistema.
+/// Cada tablet é configurado como ENTRADA ou SAIDA.
+model Dispositivo {
+  id           String          @id @default(uuid())
+  /// Nome amigável do dispositivo (ex: "Entrada Principal", "Saída Lateral")
+  nome         String
+  /// Tipo do dispositivo: ENTRADA para registrar chegada, SAIDA para registrar saída
+  tipo         TipoDispositivo
+  /// Localização física do dispositivo no recinto
+  localizacao  String?
+  /// Indica se o dispositivo está ativo e operacional
+  ativo        Boolean         @default(true)
+  /// Eventos registrados por este dispositivo
+  eventos      Evento[]
+  /// Data de cadastro do dispositivo
+  criado_em    DateTime        @default(now())
+  /// Data da última atualização do cadastro
+  atualizado_em DateTime      @updatedAt
+
+  @@map("dispositivos")
+}
+
+/// Eventos de entrada ou saída registrados pelo sistema.
+/// Cada registro representa uma pessoa passando por um dispositivo.
+model Evento {
+  id               String     @id @default(uuid())
+  /// ID do dispositivo que registrou o evento
+  dispositivo_id   String
+  /// Dispositivo que registrou o evento
+  dispositivo      Dispositivo @relation(fields: [dispositivo_id], references: [id])
+  /// Tipo do evento: ENTRADA ou SAIDA
+  tipo             TipoEvento
+  /// URL da imagem capturada do rosto da pessoa
+  imagem_rosto_url String?
+  /// Vetor de características faciais (embedding de 128 dimensões)
+  vetor_caracteristicas Float[]
+  /// Nível de confiança da detecção facial (0.0 a 1.0)
+  confianca        Float?
+  /// ID da pessoa (preenchido após rotulagem manual)
+  pessoa_id        String?
+  /// Pessoa identificada/rotulada (posterior ao registro)
+  pessoa           Pessoa?    @relation(fields: [pessoa_id], references: [id])
+  /// Data e hora do registro do evento
+  registrado_em    DateTime   @default(now())
+
+  @@index([dispositivo_id])
+  @@index([registrado_em])
+  @@index([tipo])
+  @@index([pessoa_id])
+  @@map("eventos")
+}
+
+/// Pessoas rotuladas/identificadas no sistema.
+/// Cadastro feito manualmente pelo operador para gerar relatórios.
+model Pessoa {
+  id        String       @id @default(uuid())
+  /// Nome completo da pessoa
+  nome      String
+  /// Rótulo ou categoria da pessoa (ex: "Funcionário", "Visitante")
+  rotulo    String?
+  /// URL da foto principal de referência
+  foto_url  String?
+  /// Eventos associados a esta pessoa
+  eventos   Evento[]
+  /// Rostos de referência cadastrados para esta pessoa
+  rostos    RostoPessoa[]
+  /// Data de cadastro da pessoa
+  criado_em DateTime     @default(now())
+
+  @@map("pessoas")
+}
+
+/// Rostos de referência de uma pessoa.
+/// Usados para matching facial e identificação automática futura.
+model RostoPessoa {
+  id                    String   @id @default(uuid())
+  /// ID da pessoa dona deste rosto
+  pessoa_id             String
+  /// Pessoa associada a este rosto
+  pessoa                Pessoa   @relation(fields: [pessoa_id], references: [id], onDelete: Cascade)
+  /// Vetor de características faciais de referência (embedding de 128 dimensões)
+  vetor_caracteristicas Float[]
+  /// URL da imagem do rosto capturado
+  imagem_url            String
+  /// Data de cadastro do rosto
+  criado_em             DateTime @default(now())
+
+  @@index([pessoa_id])
+  @@map("rostos_pessoa")
+}
+
+/// Contagem de ocupação em tempo real por localização.
+/// Incrementada em ENTRADA, decrementada em SAIDA.
+model Ocupacao {
+  id            String   @id @default(uuid())
+  /// Identificador da localização do recinto (ex: "principal", "auditório")
+  localizacao   String   @default("principal") @unique
+  /// Número atual de pessoas no recinto
+  contagem      Int      @default(0)
+  /// Data da última atualização da contagem
+  atualizado_em DateTime @updatedAt
+
+  @@map("ocupacao")
+}
+
+/// Tipos de dispositivo: ENTRADA ou SAIDA
+enum TipoDispositivo {
+  ENTRADA
+  SAIDA
+
+  @@map("tipo_dispositivo")
+}
+
+/// Tipos de evento: ENTRADA ou SAIDA
+enum TipoEvento {
+  ENTRADA
+  SAIDA
+
+  @@map("tipo_evento")
+}

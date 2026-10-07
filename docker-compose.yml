@@ -1,0 +1,72 @@
+services:
+  # Banco de Dados PostgreSQL
+  db:
+    image: postgres:16-alpine
+    container_name: apmonitora_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USUARIO:-apmonitora}
+      POSTGRES_PASSWORD: ${DB_SENHA:-apmonitora_pass}
+      POSTGRES_DB: ${DB_DATABASE:-apmonitora_db}
+    ports:
+      - "${DB_PORTA:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USUARIO:-apmonitora} -d ${DB_DATABASE:-apmonitora_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Microserviço Python para Visão Computacional (FastAPI + OpenCV + face_recognition)
+  face-service:
+    build:
+      context: ./face-service
+      dockerfile: Dockerfile
+    container_name: apmonitora_face_service
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+
+  # API Backend Node.js (Express + Socket.io + Prisma ORM)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: apmonitora_backend
+    restart: always
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - DATABASE_URL=postgresql://${DB_USUARIO:-apmonitora}:${DB_SENHA:-apmonitora_pass}@db:5432/${DB_DATABASE:-apmonitora_db}?schema=public
+      - FACE_SERVICE_URL=http://face-service:8000
+      - CORS_ORIGINS=*
+      - UPLOAD_DIR=./uploads
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+      face-service:
+        condition: service_started
+
+  # Web App PWA Frontend (Nginx Proxy + Static Files + HTTPS SSL)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: apmonitora_frontend
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./certs:/etc/nginx/certs
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
